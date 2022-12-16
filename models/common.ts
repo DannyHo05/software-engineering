@@ -13,3 +13,19 @@ export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 export type AppPropsWithLayout = AppProps & {
     Component: NextPageWithLayout
   }
+
+export type Alert = {
+  msg:string,
+   type: 'success'|'warning'|'error',
+}
+
+export type ProfileType = {
+  role: string,
+  function:string[],
+  user_id:string,
+  name:string,
+  birthday:string,
+  username:string,
+  topicid:string,
+  departmentid:string
+}

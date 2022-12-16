@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { useAcceptCookies } from "@/hooks";
 import {
+  DownOutlined,
   LaptopOutlined,
+  LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   NotificationOutlined,
+  PlusCircleOutlined,
+  SmileOutlined,
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
-import type { MenuProps } from "antd";
+import { Avatar, Dropdown, MenuProps, Space } from "antd";
 import { Breadcrumb, Layout, Menu, Typography } from "antd";
 import desktop from "@/assets/images/desktop.jpg";
 import Image, { StaticImageData } from "next/image";
@@ -22,120 +25,110 @@ import help from "@/assets/images/Actions-help-contents-icon.png";
 import chartIcon from "@/assets/images/chart-icon.png";
 import search from "@/assets/images/Search-icon.png";
 import logo from "../../assets/images/bg_body.jpg";
+import Cookies from "js-cookie";
+import { useAuth } from "@/hooks/useAuth";
+import { ProfileType } from "@/models/common";
+import { SideBarOptions } from "@/utils/enum";
 const { Header, Content, Sider } = Layout;
-const items1: MenuProps["items"] = ["1", "2", "3"].map((key) => ({
-  key,
-  label: `nav ${key}`,
-}));
+
+
+
 
 const imgElement = (src: StaticImageData, name: string) => (
   <Image src={src} priority alt={name} width={24} height={24}></Image>
 );
 
-const itemSidebar: itemSideBar[] = [
-  {
-    label: "Trang Chủ",
-    icon: imgElement(home, "home_icon"),
-    key: "home",
-  },
-  {
-    label: "Danh sách đề tài",
-    icon: imgElement(listTopic, "list_icon"),
-    key: "listTopic",
-  },
-  {
-    label: "Thông tin giảng viên",
-    icon: imgElement(teacher, "teacher_icon"),
-    key: "lecturers",
-  },
-  {
-    label: "Hướng dẫn đăng ký",
-    icon: imgElement(help, "help_icon"),
-    key: "doc",
-  },
-  {
-    label: "Thống kê",
-    icon: imgElement(chartIcon, "chart_icon"),
-    key: "Statistical",
-  },
-  {
-    label: "Tìm kiếm",
-    icon: imgElement(search, "search_icon"),
-    key: "search",
-  },
-];
 
-const items2: MenuProps["items"] = itemSidebar;
+
 export const MainLayout = ({ children }: React.PropsWithChildren<{}>) => {
+  const {profile} = useAuth()
   const router = useRouter();
-  const { acceptedCookies, onAcceptCookies } = useAcceptCookies();
   const [collapsed, setCollapsed] = useState(false);
+  const [tab, setTab] = useState("home");
+  const [sidebar, setSidebar] = useState<itemSideBar[]>([])
+  let itemSideBar: itemSideBar[] = [
+    {
+      label: (<div onClick={()=>{router.replace('/home')}}>Trang chủ</div>),
+      icon: imgElement(home, "home_icon"),
+      key: "home",
+    },
+    {
+      label: (<div onClick={()=>{
+        router.replace('/ListTopic')}}>Danh sách đề tài</div>),
+      icon: imgElement(listTopic, "list_icon"),
+      key: "ListTopic",
+    },
+    {
+      label: "Thông tin giảng viên",
+      icon: imgElement(teacher, "teacher_icon"),
+      key: "lecturers",
+    },
+    {
+      label: "Hướng dẫn đăng ký",
+      icon: imgElement(help, "help_icon"),
+      key: "doc",
+    },
+    {
+      label: "Thống kê",
+      icon: imgElement(chartIcon, "chart_icon"),
+      key: "Statistical",
+    },
+    {
+      label: "Tìm kiếm",
+      icon: imgElement(search, "search_icon"),
+      key: "search",
+    },
+  ];
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <div>Thông tin cá nhân</div>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <div onClick={()=>logout()}>Đăng xuất</div>
+      ),
+      icon: <LogoutOutlined />,
+      danger: true
+    },
+  ];
+  useEffect(()=>{
+    const newSidebar = profile?.data.function.filter((value:"QUAN_LY_DE_TAI"|"PHE_DUYET_DE_TAI"|"DANH_GIA_DE_TAI"|"DANG_KY_DE_TAI") => {
+      return SideBarOptions[value]?.title      
+    }).map((value:"QUAN_LY_DE_TAI"|"PHE_DUYET_DE_TAI"|"DANH_GIA_DE_TAI"|"DANG_KY_DE_TAI")=>{
+      return{
+        label:(<div onClick={()=>{
+          router.replace(`/${SideBarOptions[value]?.link}`)}}>{SideBarOptions[value]?.title}</div>),
+        icon:<PlusCircleOutlined />,
+        key:value
+      }
+    })
+    setSidebar(newSidebar)
+  },[profile])
+  useEffect(() => {
+    setTab(router.asPath.split('/')[1])
+    if (!Cookies.get("token")) {
+      router.replace("/auth/login");
+    }
+  }, []);
+  const logout = ()=>{
+    Cookies.remove("token");
+    router.replace("/auth/login");
+  }
   return (
     <div className="h-screen overflow-x-hidden bg-[#fafafa]">
-      {/* <Layout className="bg-[#fafafa]">
-        <Header
-          className=""
-          style={{
-            height: "fit-content",
-            padding: 0,
-          }}
-        >
-          <div className="w-screen h-32 ">
-            <Image
-              objectFit="cover"
-              src={desktop}
-              alt=""
-              className="w-full h-full"
-            />
-          </div>
-        </Header>
-        <Content style={{ padding: "0 50px" }}>
-          <Layout
-            className="site-layout-background bg-[#fafafa]"
-            style={{ padding: "24px 0" }}
-          >
-            <Sider
-              className="site-layout-background rounded-lg overflow-hidden"
-              width={250}
-              style={{ border: "1px solid #ccc" }}
-            >
-              <Header
-                className="flex items-center w-full"
-                style={{
-                  background: "#fff",
-                  padding: "34px 24px",
-                  borderBottom: "1px solid #ccc",
-                  borderRight: "1px solid #ccc",
-                }}
-              >
-                <Typography.Title
-                  level={5}
-                  style={{ margin: 0, color: "#000" }}
-                >
-                  Danh Mục
-                </Typography.Title>
-              </Header>
-              <Menu
-                mode="inline"
-                defaultSelectedKeys={["home"]}
-                defaultOpenKeys={["sub1"]}
-                style={{ height: "100%" }}
-                className="text-[16px]"
-                items={items2}
-              />
-            </Sider>
-            <Content style={{ padding: "0 24px", minHeight: 280 }}>
-              Content
-            </Content>
-          </Layout>
-        </Content>
-      </Layout> */}
-      <div className="w-screen h-32" style={{
-        backgroundColor:"#599EE7"
-      }}>
+      <div
+        className="w-screen h-32"
+        style={{
+          backgroundColor: "#599EE7",
+        }}
+      >
         <Image
           style={{
-            objectFit: "contain"
+            objectFit: "contain",
           }}
           src={desktop}
           alt=""
@@ -153,19 +146,29 @@ export const MainLayout = ({ children }: React.PropsWithChildren<{}>) => {
           <div className="logo">
             {/* <Image width={64} height={64} src={logo} alt="logo" /> */}
             <Typography.Title level={5} style={{ margin: 0, color: "#000" }}>
-              Danh Mục
+              Danh mục
             </Typography.Title>
           </div>
-          <Menu
+          
+          {sidebar ? (<Menu
             theme="dark"
             mode="inline"
-            defaultSelectedKeys={["home"]}
-            items={itemSidebar}
+            defaultSelectedKeys={[tab]}
+            items={[...itemSideBar, ...sidebar]}
             className="bg-[#fafafa] text-black"
-          />
+          />):<Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={[tab]}
+          items={[...itemSideBar]}
+          className="bg-[#fafafa] text-black"
+        />}
         </Sider>
         <Layout className="site-layout">
-          <Header className="site-layout-background" style={{ padding: 0 }}>
+          <Header
+            className="site-layout-background flex justify-between items-center"
+            style={{ paddingRight: "16px" }}
+          >
             {React.createElement(
               collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
               {
@@ -173,6 +176,17 @@ export const MainLayout = ({ children }: React.PropsWithChildren<{}>) => {
                 onClick: () => setCollapsed(!collapsed),
               }
             )}
+
+            <Dropdown menu={{ items }}>
+              <div onClick={(e) => e.preventDefault()}>
+                <Space>
+                <span>{profile?.data?.name}</span>
+                <Avatar size="small" icon={<UserOutlined />} />
+                </Space>
+              </div>
+            </Dropdown>
+
+            
           </Header>
           <Content
             className="site-layout-background"
@@ -182,7 +196,7 @@ export const MainLayout = ({ children }: React.PropsWithChildren<{}>) => {
               minHeight: 280,
             }}
           >
-            Content
+            {children}
           </Content>
         </Layout>
       </Layout>
