@@ -12,6 +12,7 @@ export const useAlert = () => {
         content: alert?.msg,
       });
     }
+    return messageApi.destroy()
   }, [alert]);
   return {
     contextHolder,

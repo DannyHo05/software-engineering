@@ -42,7 +42,7 @@ const ListTopic = () => {
   ];
   let dataSource: readonly DataType[] | undefined = []
   if(data?.data){
-    dataSource = data.data.map(value=>{
+    dataSource = data.data.filter(value=>value.status===1).map(value=>{
       return {
         id: value.id,
         key: value.topic_id,

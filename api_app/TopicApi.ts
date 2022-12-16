@@ -11,5 +11,8 @@ export const TopicApi = {
     },
     changeStatus(payload:{status:number, id:number}){
         return axiosClient.put("/rest/topic/status", payload)
+    },
+    getTopicDetail(){
+        
     }
 }

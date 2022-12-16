@@ -5,6 +5,8 @@ export type TopicType = {
   topic_id: string;
   description: string;
   status: number;
+  end_day?:Date;
+  start_day?:Date;
   departments: {
     id: number;
     department_id: string;

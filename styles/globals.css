@@ -1,7 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@layer components {
+  .my-button {
+    @apply bg-blue-600 w-full flex justify-center items-center text-white
+  }
+}
 .trigger {
     padding: 0 24px;
     font-size: 18px;
