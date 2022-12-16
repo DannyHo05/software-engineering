@@ -6,7 +6,6 @@ import { topicResPayload, TopicType } from "@/models";
 import { EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, DatePicker, Form, Input, Modal, Space, Table } from "antd";
 import type { ColumnsType } from "antd/lib/table";
-import { TopicArn } from "aws-sdk/clients/directoryservice";
 import React, { useState } from "react";
 import moment from 'moment';
 import dayjs from 'dayjs';
