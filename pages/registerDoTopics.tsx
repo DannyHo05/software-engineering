@@ -1,3 +1,4 @@
+import axiosClient from "@/api_app/AxiosClient";
 import { TopicApi } from "@/api_app/TopicApi";
 import { MainLayout } from "@/components/layout";
 import { useAlert } from "@/hooks";
@@ -20,15 +21,15 @@ interface DataType {
   register: string;
 }
 
-import useSWR from "swr";
-
+import useSWR, { useSWRConfig } from "swr";
 const RegisterDoTopics = () => {
+  const{ mutate: mutateUpdate } = useSWRConfig()
   const {setAlert, contextHolder} = useAlert()
   const { profile } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [idTopic, setIdTopic] = useState<string>("");
+  const [idTopicStudent, setIdTopicStudent] = useState<string>(profile?.data?.topicid);
   const [form] = Form.useForm();
-  const id = profile.topicid;
   const rangeConfig = {
     rules: [
       {
@@ -42,7 +43,9 @@ const RegisterDoTopics = () => {
     data: dataTopic,
     error: errorTopic,
     mutate: mutateTopic,
-  } = useSWR(`/rest/topic/${id?.slice(1)}`);
+  } = useSWR([`/rest/topic/${idTopicStudent?.slice(0)}`,1],{
+    
+    fetcher: ([url,key]) => axiosClient.get(url)});
   const {
     data: topicDetail,
     error: errorDetail,
@@ -109,13 +112,24 @@ const RegisterDoTopics = () => {
   };
   const onFinish = async (values: any) => {
     const payload = {
+      status:1,
+      topic:{
+        id:Number(idTopic?.slice(1))
+      },
+      student:{
+          id: Number(profile?.data?.user_id?.slice(2))
+      }
     };
-    // const data = await TopicApi.updateTopic(payload);
-      // if (data.status === 200) {
-      //   setAlert({ type: "success", msg: "Cập nhật đề tài thành công!" });
-      // } else {
-      //   setAlert({ type: "error", msg: "Cập nhật đề tài không thành công!" });
-      // }
+
+    const data = await TopicApi.registerDoTopics(payload);
+      if (data.status === 200) {
+        setAlert({ type: "success", msg: "Đăng ký đề tài thành công!" });
+        setIdTopicStudent(idTopic.slice(1))
+      } else {
+        setAlert({ type: "error", msg: "Đăng ký đề tài không thành công!" });
+      }
+    setIsModalOpen(false);
+
   };
   useEffect(()=>{
     form.setFieldsValue({
@@ -153,25 +167,25 @@ const RegisterDoTopics = () => {
           <li className="flex justify-between border-b-2">
             <div className="w-1/2 border-r-2 border-solid p-4">Khoa</div>
             <div className="p-4 text-left w-1/2">
-              {dataTopic?.data.departments.name}
+              {dataTopic?.data.departments?.name}
             </div>
           </li>
-          <li className="flex justify-between border-b-2">
+          {/* <li className="flex justify-between border-b-2">
             <div className="w-1/2 border-r-2 border-solid p-4">
               Sinh viên thực hiện
             </div>
             <div className="p-4 text-left w-1/2">
-              {dataTopic?.data.students
+              {dataTopic?.data?.students
                 ?.map((value: any) => value.name)
                 .join(", ")}
             </div>
-          </li>
+          </li> */}
           <li className="flex justify-between border-b-2 bg-green-200">
             <div className="w-1/2 border-r-2 border-solid p-4">
               Giáo viên hướng dẫn
             </div>
             <div className="p-4 text-left w-1/2">
-              {dataTopic?.data.instructors.name}
+              {dataTopic?.data.instructors?.name}
             </div>
           </li>
           <li className="flex justify-between border-b-2 bg-yellow-200">
@@ -179,7 +193,7 @@ const RegisterDoTopics = () => {
               Giáo viên phản biện
             </div>
             <div className="p-4 text-left w-1/2">
-              {dataTopic?.data.instructors.name }
+              {dataTopic?.data.instructors?.name }
             </div>
           </li>
         </ul>
@@ -211,6 +225,7 @@ const RegisterDoTopics = () => {
           form={form}
           id="myForm"
           disabled
+          onFinish={onFinish}
         >
           <Form.Item
             label="Tên đề tài: "

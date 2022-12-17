@@ -237,10 +237,10 @@ const ManageTopics = () => {
               optionFilterProp="children"
               onChange={onChange}
               onSearch={onSearch}
-              options={listInstructor&&listInstructor.data?.map((option) =>({
-                value: option.instructor_id || '',
-                label: option.name
-              }))}
+              // options={listInstructor&&listInstructor.data?.map((option) =>({
+              //   value: option.instructor_id || '',
+              //   label: option.name
+              // }))}
             />
           </Form.Item>
           <Form.Item required name="status" label="Trạng thái phê duyệt: ">

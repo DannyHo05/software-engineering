@@ -2,6 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 const axiosClient = axios.create({
     baseURL:process.env.NEXT_PUBLIC_BASE_URL,
+    timeout: 60000,
     headers:{
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': 'http://localhost:3001',

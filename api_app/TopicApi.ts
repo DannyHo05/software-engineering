@@ -1,4 +1,5 @@
-import { topicResPayload, TopicType } from "@/models"
+import { registerDoTopicsPayload, topicResPayload, TopicType } from "@/models"
+import registerTopics from "@/pages/registerTopics"
 import axiosClient from "./AxiosClient"
 
 
@@ -23,5 +24,8 @@ export const TopicApi = {
     },
     searchTopic(payload: string){
         return axiosClient.get(`/rest/instuctors/find`, {data:payload})
+    },
+    registerDoTopics(payload:registerDoTopicsPayload){
+        return  axiosClient.post(`/rest/join`,payload)
     }
 }

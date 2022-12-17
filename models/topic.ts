@@ -43,3 +43,13 @@ export type topicResPayload = {
   end_day : Date;
   status:number;
 }
+
+export type registerDoTopicsPayload = {
+  status:number;
+  topic:{
+    id:number;
+  }
+  student:{
+    id:number;
+  }
+}
