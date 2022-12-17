@@ -27,15 +27,15 @@ axiosClient.interceptors.response.use(function (response) {
   }, async function (error) {
    
     const originalRequest = error.config;
-    if(error.response.status === 401){
+    if(error.response?.status === 401){
       const win: Window = window;
       win.location = '/auth/login'
       return error.response
     }
-    if(error.response.status === 500){
+    if(error.response?.status === 500){
       return error.response
     }
-    if (error.response.status === 403 && !originalRequest._retry) {
+    if (error.response?.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
       const access_token = await refreshAccessToken();            
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;

@@ -6,14 +6,16 @@ export const useAlert = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [alert, setAlert] = useState<Alert>();
   useEffect(() => {
-    if (alert) {
-      messageApi.open({
-        type: alert?.type,
-        content: alert?.msg,
-      });
+    if (alert?.msg) {
+    alertFu()
     }
-    return messageApi.destroy()
   }, [alert]);
+  const alertFu = ()=>{
+    return messageApi.open({
+      type: alert?.type,
+      content: alert?.msg,
+    });
+  }
   return {
     contextHolder,
     setAlert: setAlert,

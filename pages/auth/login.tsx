@@ -32,13 +32,13 @@ const Login = () => {
     const payload = { username: values.username, password: values.password };
     const { data, status } = await AuthApi.login(payload);
     if (data) {
-      console.log(data);
       if (data.status === true) {
         setAlert({ type: "success", msg: "Đăng nhập thành công!" });
         Cookies.set("token", data.token);
-        router.replace("/home");
+        setTimeout(() => {
+          router.replace("/home");
+        }, 1000);
       } else {
-        console.log(data.token);
         setAlert({ type: "error", msg: "Đăng nhập không thành công!" });
       }
     }

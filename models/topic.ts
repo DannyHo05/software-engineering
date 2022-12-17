@@ -31,6 +31,7 @@ export type TopicType = {
 };
 
 export type topicResPayload = {
+  id?:number
   description: string;
   departments: {
     id: number;

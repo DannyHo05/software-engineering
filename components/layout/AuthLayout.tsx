@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useRouter } from "next/router";
 import { layoutPro } from "@/models/common";
 import bgAuth from "@/assets/images/bgAuth.jpeg";

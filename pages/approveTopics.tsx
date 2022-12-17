@@ -2,9 +2,9 @@ import { TopicApi } from "@/api_app/TopicApi";
 import { MainLayout } from "@/components/layout";
 import { Button } from "antd";
 import Table from "antd/lib/table";
-import type { ColumnsType } from 'antd/lib/table';
-import React from "react";
-import useSWR from "swr";
+import type { ColumnsType } from "antd/lib/table";
+import React, { useEffect } from "react";
+import useSWR, { useSWRConfig } from "swr";
 const { Column, ColumnGroup } = Table;
 interface DataType {
   id: number;
@@ -15,6 +15,7 @@ interface DataType {
 }
 
 const ApproveTopics = () => {
+  const { mutate: mutateUpdate } = useSWRConfig();
   const { data, error, mutate } = useSWR("/rest/topic", {
     fetcher: () => TopicApi.getTopic(),
   });
@@ -54,8 +55,10 @@ const ApproveTopics = () => {
                 status: 1,
                 id: Number(rec.key.slice(1)),
               });
-              const newArr = data
-              mutate(newArr,true)
+              const newArr = data;
+              mutateUpdate("/rest/topic",{
+                fetcher: () => TopicApi.getTopic(),
+              });
             }}
           >
             Phê duyệt
@@ -64,15 +67,15 @@ const ApproveTopics = () => {
             danger
             type="text"
             className=" w-[50px] flex justify-center items-center ml-2"
-            onClick={() =>{
-                TopicApi.changeStatus({
-                  status: 4,
-                  id: Number(rec.key.slice(1)),
-                });
-                const newArr = data
-                mutate(newArr,true)
-              }
-            }
+            onClick={async () => {
+              await TopicApi.changeStatus({
+                status: 4,
+                id: Number(rec.key?.slice(1)),
+              });
+              mutateUpdate("/rest/topic",{
+                fetcher: () => TopicApi.getTopic(),
+              });
+            }}
           >
             Hủy
           </Button>
@@ -83,6 +86,24 @@ const ApproveTopics = () => {
   ];
 
   let dataSource: readonly DataType[] | undefined = [];
+  useEffect(() => {
+    if (data?.data) {
+      dataSource = data.data
+        .filter((value) => {
+          return value.status === 0;
+        })
+        .map((value, index) => {
+          return {
+            id: index + 1,
+            key: value.topic_id,
+            description: value.description || "Unknown",
+            instructors: value.instructors?.name,
+            approve: value.topic_id,
+          };
+        });
+    }
+  }, [data])
+  
   if (data?.data) {
     dataSource = data.data
       .filter((value) => {
@@ -98,6 +119,7 @@ const ApproveTopics = () => {
         };
       });
   }
+  
   return (
     <div>
       <h1 className="font-bold text-2xl mb-4">PHÊ DUYỆT ĐỀ TÀI</h1>

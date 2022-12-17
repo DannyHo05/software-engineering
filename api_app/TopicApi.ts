@@ -14,5 +14,14 @@ export const TopicApi = {
     },
     getTopicDetail(){
         
+    },
+    updateTopic(payload: topicResPayload){
+        return axiosClient.put("/rest/topic", payload)
+    },
+    deleteTopic(payload: number|string){
+        return axiosClient.delete(`/rest/topic/${payload}`)
+    },
+    searchTopic(payload: string){
+        return axiosClient.get(`/rest/instuctors/find`, {data:payload})
     }
 }

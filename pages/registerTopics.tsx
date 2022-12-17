@@ -28,7 +28,6 @@ const registerTopics = () => {
     let dateEnd = new Date();
     dateStart = values.date[0].$d;
     dateEnd = values.date[1].$d;
-    console.log(dateStart.toISOString());
     const payload: topicResPayload = {
       start_day: dateStart,
       end_day: dateEnd,

@@ -29,3 +29,6 @@ export type ProfileType = {
   topicid:string,
   departmentid:string
 }
+
+export type SideBarType = 
+  "QUAN_LY_DE_TAI"|"PHE_DUYET_DE_TAI"|"DANH_GIA_DE_TAI"|"DANG_KY_DE_TAI"

@@ -27,7 +27,7 @@ const DetailTopic = () => {
         </li>
         <li className="flex justify-between border-b-2">
             <div className="w-1/2 border-r-2 border-solid p-4">Sinh viên thực hiện</div>
-            <div className="p-4 text-left w-1/2">{data?.data.students.map((value:any)=>value.name).join(', ') || 'Chưa có sinh viên thực hiện'}</div>
+            <div className="p-4 text-left w-1/2">{data?.data.students?.map((value:any)=>value.name).join(', ') || 'Chưa có sinh viên thực hiện'}</div>
         </li>
         <li className="flex justify-between border-b-2 bg-green-200">
             <div className="w-1/2 border-r-2 border-solid p-4">Giáo viên hướng dẫn</div>

@@ -13,7 +13,7 @@ import {
   UserOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
-import { Avatar, Dropdown, MenuProps, Space } from "antd";
+import { Avatar, Dropdown, MenuProps, Space, Spin } from "antd";
 import { Breadcrumb, Layout, Menu, Typography } from "antd";
 import desktop from "@/assets/images/desktop.jpg";
 import Image, { StaticImageData } from "next/image";
@@ -27,8 +27,9 @@ import search from "@/assets/images/Search-icon.png";
 import logo from "../../assets/images/bg_body.jpg";
 import Cookies from "js-cookie";
 import { useAuth } from "@/hooks/useAuth";
-import { ProfileType } from "@/models/common";
+import { ProfileType, SideBarType } from "@/models/common";
 import { SideBarOptions } from "@/utils/enum";
+import { useAlert } from "@/hooks";
 const { Header, Content, Sider } = Layout;
 
 
@@ -41,7 +42,7 @@ const imgElement = (src: StaticImageData, name: string) => (
 
 
 export const MainLayout = ({ children }: React.PropsWithChildren<{}>) => {
-  const {profile} = useAuth()
+  const {profile,mutate} = useAuth()
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [tab, setTab] = useState("home");
@@ -96,9 +97,9 @@ export const MainLayout = ({ children }: React.PropsWithChildren<{}>) => {
     },
   ];
   useEffect(()=>{
-    const newSidebar = profile?.data.function.filter((value:"QUAN_LY_DE_TAI"|"PHE_DUYET_DE_TAI"|"DANH_GIA_DE_TAI"|"DANG_KY_DE_TAI") => {
+    const newSidebar = profile?.data.function?.filter((value:SideBarType) => {
       return SideBarOptions[value]?.title      
-    }).map((value:"QUAN_LY_DE_TAI"|"PHE_DUYET_DE_TAI"|"DANH_GIA_DE_TAI"|"DANG_KY_DE_TAI")=>{
+    })?.map((value:SideBarType)=>{
       return{
         label:(<div onClick={()=>{
           router.replace(`/${SideBarOptions[value]?.link}`)}}>{SideBarOptions[value]?.title}</div>),
@@ -116,90 +117,92 @@ export const MainLayout = ({ children }: React.PropsWithChildren<{}>) => {
   }, []);
   const logout = ()=>{
     Cookies.remove("token");
+    mutate(null)
     router.replace("/auth/login");
   }
-  return (
-    <div className="h-screen overflow-x-hidden bg-[#fafafa]">
-      <div
-        className="w-screen h-32"
+  return(profile?.data?.function ? (<div className="h-screen overflow-x-hidden bg-[#fafafa]">
+  <div
+    className="w-screen h-32"
+    style={{
+      backgroundColor: "#599EE7",
+    }}
+  >
+    <Image
+      style={{
+        objectFit: "contain",
+      }}
+      src={desktop}
+      alt=""
+      className="w-full h-full"
+    />
+  </div>
+  <Layout className="bg-[#fafafa] min-h-screen">
+    <Sider
+      trigger={null}
+      collapsible
+      collapsed={collapsed}
+      style={{ backgroundColor: "#fafafa" }}
+      width={250}
+    >
+      <div className="logo">
+        {/* <Image width={64} height={64} src={logo} alt="logo" /> */}
+        <Typography.Title level={5} style={{ margin: 0, color: "#000" }}>
+          Danh mục
+        </Typography.Title>
+      </div>
+      
+      {sidebar ? (<Menu
+        theme="dark"
+        mode="inline"
+        defaultSelectedKeys={[tab]}
+        items={[...itemSideBar, ...sidebar]}
+        className="bg-[#fafafa] text-black"
+      />):<Menu
+      theme="dark"
+      mode="inline"
+      defaultSelectedKeys={[tab]}
+      items={[...itemSideBar]}
+      className="bg-[#fafafa] text-black"
+    />}
+    </Sider>
+    <Layout className="site-layout">
+      <Header
+        className="site-layout-background flex justify-between items-center"
+        style={{ paddingRight: "16px" }}
+      >
+        {React.createElement(
+          collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
+          {
+            className: "trigger",
+            onClick: () => setCollapsed(!collapsed),
+          }
+        )}
+
+        <Dropdown menu={{ items }}>
+          <div onClick={(e) => e.preventDefault()}>
+            <Space>
+            <span>{profile?.data?.name}</span>
+            <Avatar size="small" icon={<UserOutlined />} />
+            </Space>
+          </div>
+        </Dropdown>
+
+        
+      </Header>
+      <Content
+        className="site-layout-background"
         style={{
-          backgroundColor: "#599EE7",
+          margin: "24px 16px",
+          padding: 24,
+          minHeight: 280,
         }}
       >
-        <Image
-          style={{
-            objectFit: "contain",
-          }}
-          src={desktop}
-          alt=""
-          className="w-full h-full"
-        />
-      </div>
-      <Layout className="bg-[#fafafa] min-h-screen">
-        <Sider
-          trigger={null}
-          collapsible
-          collapsed={collapsed}
-          style={{ backgroundColor: "#fafafa" }}
-          width={250}
-        >
-          <div className="logo">
-            {/* <Image width={64} height={64} src={logo} alt="logo" /> */}
-            <Typography.Title level={5} style={{ margin: 0, color: "#000" }}>
-              Danh mục
-            </Typography.Title>
-          </div>
-          
-          {sidebar ? (<Menu
-            theme="dark"
-            mode="inline"
-            defaultSelectedKeys={[tab]}
-            items={[...itemSideBar, ...sidebar]}
-            className="bg-[#fafafa] text-black"
-          />):<Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={[tab]}
-          items={[...itemSideBar]}
-          className="bg-[#fafafa] text-black"
-        />}
-        </Sider>
-        <Layout className="site-layout">
-          <Header
-            className="site-layout-background flex justify-between items-center"
-            style={{ paddingRight: "16px" }}
-          >
-            {React.createElement(
-              collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
-              {
-                className: "trigger",
-                onClick: () => setCollapsed(!collapsed),
-              }
-            )}
-
-            <Dropdown menu={{ items }}>
-              <div onClick={(e) => e.preventDefault()}>
-                <Space>
-                <span>{profile?.data?.name}</span>
-                <Avatar size="small" icon={<UserOutlined />} />
-                </Space>
-              </div>
-            </Dropdown>
-
-            
-          </Header>
-          <Content
-            className="site-layout-background"
-            style={{
-              margin: "24px 16px",
-              padding: 24,
-              minHeight: 280,
-            }}
-          >
-            {children}
-          </Content>
-        </Layout>
-      </Layout>
-    </div>
-  );
+        {children}
+      </Content>
+    </Layout>
+  </Layout>
+</div>):(<div className="flex w-screen h-screen items-center justify-center">
+  <Spin size="large"></Spin>
+</div>))
+    
 };
